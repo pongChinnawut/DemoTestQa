@@ -1,3 +1,21 @@
+# name: Automated API tests using Postman CLI
+
+# on: push
+
+# jobs:
+#   automated-api-tests:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Install Postman CLI
+#         run: |
+#           curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+#       - name: Login to Postman CLI
+#         run: postman login --with-api-key PMAK-6909fd258f388d000189e9fb-f56b2973ba009b4508ee6fd19d8b989409
+#       - name: Run API tests
+#         run: |
+#           postman collection run "11492988-c5012745-3d76-4e52-9239-d341b6145615"
+
 name: Automated API tests using Postman CLI
 
 on: push
@@ -5,13 +23,33 @@ on: push
 jobs:
   automated-api-tests:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
+      # ติดตั้ง Postman CLI (ถ้ายังอยากใช้ด้วย)
       - name: Install Postman CLI
         run: |
           curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
-      - name: Login to Postman CLI
-        run: postman login --with-api-key PMAK-6909fd258f388d000189e9fb-f56b2973ba009b4508ee6fd19d8b989409
-      - name: Run API tests
+
+      # ติดตั้ง Newman ผ่าน npm
+      - name: Install Newman
         run: |
-          postman collection run "11492988-c5012745-3d76-4e52-9239-d341b6145615"
+          npm install -g newman newman-reporter-htmlextra
+
+      # รัน Newman ด้วย collection + environment (แก้ชื่อไฟล์ให้ตรงกับ repo)
+      - name: Run API tests with Newman
+        run: |
+          newman run tests/collection.json \
+            --environment DemoQA.postman_collection.json \
+            --reporters cli,htmlextra,json \
+            --reporter-htmlextra-export report/newman-report.html \
+            --reporter-json-export report/newman-report.json
+
+      # บันทึกผลลัพธ์เป็น artifact (โหลดดูได้จากหน้า workflow)
+      - name: Upload Newman Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-report
+          path: report/
+
