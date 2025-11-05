@@ -40,6 +40,7 @@ jobs:
       # รัน Newman ด้วย collection + environment (แก้ชื่อไฟล์ให้ตรงกับ repo)
       - name: Run API tests with Newman
         run: |
+          mkdir -p report reports
           newman run DemoQA.postman_collection.json \
             --reporters cli,htmlextra,json \
             --reporter-htmlextra-export report/newman-report.html \
