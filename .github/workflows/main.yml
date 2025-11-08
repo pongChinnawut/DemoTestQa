@@ -47,7 +47,8 @@ jobs:
           newman run DemoQA.postman_collection.json \
             --reporters cli,htmlextra,json \
             --reporter-htmlextra-export report/newman-report.html \
-            --reporter-json-export reports/newman-report.json
+            --reporter-json-export reports/newman-report.html
+          newman run DemoQA.postman_collection.json -r cli,htmlextra --reporter-htmlextra-export reports/newman-report.html
 
       # บันทึกผลลัพธ์เป็น artifact (โหลดดูได้จากหน้า workflow)
       - name: Upload Newman Report
